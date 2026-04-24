@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FastBox - Панель курьера</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #F5F5F5; }
+    header { position: fixed; top: 0; left: 0; right: 0; height: 72px; background: #1A1A1A; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 100; }
+    .logo { display: flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 700; color: #00D948; text-decoration: none; }
+    .logo span { font-size: 28px; }
+    .courier-status { display: flex; gap: 8px; }
+    .status-btn { padding: 8px 16px; background: #333; border: none; border-radius: 8px; color: #fff; font-weight: 500; cursor: pointer; }
+    .status-btn.active { background: #00D948; }
+    .status-btn.offline { background: #FF3D00; }
+    
+    main { padding-top: 72px; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 24px; }
+    
+    .courier-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; color: #fff; }
+    .user-info { display: flex; align-items: center; gap: 16px; }
+    .user-avatar { width: 60px; height: 60px; border-radius: 50%; background: #00D948; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    .user-name { font-size: 24px; font-weight: 700; }
+    .user-rating { color: #FFB800; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: #fff; padding: 24px; border-radius: 16px; text-align: center; }
+    .stat-num { font-size: 32px; font-weight: 700; color: #00D948; }
+    .stat-label { font-size: 14px; color: #666; margin-top: 4px; }
+    
+    .section { background: #fff; padding: 24px; border-radius: 16px; margin-bottom: 24px; }
+    .section-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+    
+    .orders-list { display: flex; flex-direction: column; gap: 12px; }
+    .order-card { padding: 16px; background: #F5F5F5; border-radius: 12px; }
+    .order-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .order-id { font-weight: 600; }
+    .order-status { padding: 4px 8px; background: #00D948; color: #fff; border-radius: 6px; font-size: 12px; }
+    .order-address { font-size: 14px; color: #666; margin-bottom: 8px; }
+    .order-sum { font-size: 18px; font-weight: 700; }
+    .order-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .btn { padding: 10px 16px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    .btn-primary { background: #00D948; color: #fff; }
+    .btn-outline { background: #fff; border: 2px solid #E0E0E0; }
+    
+    .empty-state { text-align: center; padding: 32px; color: #666; }
+    
+    .not-courier { text-align: center; padding: 64px; }
+    .not-courier h1 { margin-bottom: 16px; }
+    .not-courier p { color: #666; margin-bottom: 24px; }
+    
+    @media (max-width: 992px) {
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      header { height: 60px; padding: 0 16px; }
+      .logo { font-size: 20px; }
+      nav { display: none; }
+      .container { padding: 16px; }
+      .stats-grid { grid-template-columns: 1fr; gap: 12px; }
+      .stat-card { padding: 16px; }
+      .stat-num { font-size: 24px; }
+      .section { padding: 16px; }
+      .section-title { font-size: 16px; }
+      .order-card { padding: 12px; }
+      .order-actions { flex-direction: column; }
+      .order-actions .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html" class="logo"><span>📦</span>FastBox</a>
+    <div class="courier-status">
+      <button class="status-btn active" onclick="setStatus('available')">На линии</button>
+      <button class="status-btn offline" onclick="setStatus('offline')">Недоступен</button>
+    </div>
+  </header>
+  
+  <main>
+    <div class="container">
+      <div id="courierContent"></div>
+    </div>
+  </main>
+  
+  <script>
+    const API_URL = 'http://localhost:5000/api';
+    let user = null;
+    let courier = null;
+    let orders = [];
+    let status = 'available';
+    
+    function checkAuth() {
+      const token = localStorage.getItem('fastbox_token');
+      user = JSON.parse(localStorage.getItem('fastbox_user') || 'null');
+      courier = user?.courier;
+      
+      if (!token || !user || user.role !== 'courier') return false;
+      return true;
+    }
+    
+    function renderDashboard() {
+      const container = document.getElementById('courierContent');
+      
+      if (!checkAuth()) {
+        container.innerHTML = `
+          <div class="not-courier">
+            <h1>🚴 Панель курьера</h1>
+            <p>Эта страница только для курьеров. Войдите как курьер.</p>
+            <a href="login.html" class="btn btn-primary">Войти</a>
+          </div>
+        `;
+        return;
+      }
+      
+      const statusLabels = {
+        pending: 'Ожидает',
+        accepted: 'Принят',
+        preparing: 'Готовится',
+        delivering: 'В пути',
+        delivered: 'Доставлен'
+      };
+      
+      const myOrders = orders.filter(o => o.courierId === courier?.id);
+      
+      container.innerHTML = `
+        <div class="courier-header">
+          <div class="user-info">
+            <div class="user-avatar">🚴</div>
+            <div>
+              <div class="user-name">${user.name}</div>
+              <div class="user-rating">⭐ ${courier?.rating?.toFixed(1) || '5.0'}</div>
+            </div>
+          </div>
+          <button class="btn btn-outline" style="background: #1A1A1A; color: #fff; border: none;" onclick="logout()">Выйти</button>
+        </div>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-num">${myOrders.filter(o => o.status === 'delivered').length}</div>
+            <div class="stat-label">Доставлено</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">${courier?.totalEarned || 0}₽</div>
+            <div class="stat-label">Заработано</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">⭐ ${courier?.rating?.toFixed(1) || '5.0'}</div>
+            <div class="stat-label">Рейтинг</div>
+          </div>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">Мои заказы</div>
+          <div class="orders-list">
+            ${myOrders.length === 0 ? `
+              <div class="empty-state">У вас пока нет заказов</div>
+            ` : myOrders.map(order => `
+              <div class="order-card">
+                <div class="order-header">
+                  <span class="order-id">#${order.id}</span>
+                  <span class="order-status">${statusLabels[order.status] || order.status}</span>
+                </div>
+                <div class="order-address">${order.address}</div>
+                <div class="order-sum">${order.total}₽</div>
+                <div class="order-actions">
+                  ${order.status === 'accepted' ? `<button class="btn btn-primary" onclick="startDelivery('${order.id}')">Выехал</button>` : ''}
+                  ${order.status === 'delivering' ? `<button class="btn btn-primary" onclick="delivered('${order.id}')">Доставил</button>` : ''}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">Доступные заказы</div>
+          <div class="orders-list">
+            ${orders.filter(o => !o.courierId && o.status === 'pending').length === 0 ? `
+              <div class="empty-state">Нет доступных заказов</div>
+            ` : orders.filter(o => !o.courierId && o.status === 'pending').map(order => `
+              <div class="order-card">
+                <div class="order-header">
+                  <span class="order-id">#${order.id}</span>
+                  <span class="order-sum">${order.total}₽</span>
+                </div>
+                <div class="order-address">${order.address}</div>
+                <div class="order-actions">
+                  <button class="btn btn-primary" onclick="acceptOrder('${order.id}')">Принять</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+    
+    function setStatus(s) {
+      status = s;
+      renderDashboard();
+    }
+    
+    function acceptOrder(orderId) {
+      alert('Заказ принят! (демо)');
+    }
+    
+    function startDelivery(orderId) {
+      alert('Вы выехали! (демо)');
+    }
+    
+    function delivered(orderId) {
+      alert('Заказ доставлен! (демо)');
+    }
+    
+    function logout() {
+      localStorage.removeItem('fastbox_token');
+      localStorage.removeItem('fastbox_user');
+      window.location.href = 'index.html';
+    }
+    
+    renderDashboard();
+  </script>
+</body>
+</html>

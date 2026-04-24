@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FastBox - Каталог</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #fff; }
+    header { position: fixed; top: 0; left: 0; right: 0; height: 72px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 100; }
+    .logo { display: flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 700; color: #00D948; text-decoration: none; }
+    .logo span { font-size: 28px; }
+    nav { display: flex; gap: 24px; }
+    nav a { color: #666; text-decoration: none; font-weight: 500; }
+    nav a:hover { color: #00D948; }
+    .header-actions { display: flex; gap: 12px; align-items: center; }
+    .btn { padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; text-decoration: none; }
+    .btn-primary { background: #00D948; color: #fff; border: none; }
+    .btn-primary:hover { background: #00B83A; }
+    .btn-outline { background: transparent; border: 2px solid #E0E0E0; color: #1A1A1A; }
+    .cart-icon { position: relative; }
+    .cart-badge { position: absolute; top: -8px; right: -8px; min-width: 20px; height: 20px; background: #00D948; color: #fff; border-radius: 10px; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+    
+    main { padding-top: 72px; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+    
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+    h1 { font-size: 32px; font-weight: 700; }
+    .search-box { display: flex; gap: 12px; }
+    .search-box input { padding: 12px 16px; border: 2px solid #E0E0E0; border-radius: 12px; width: 300px; font-size: 14px; }
+    
+    .catalog-layout { display: grid; grid-template-columns: 250px 1fr; gap: 32px; }
+    .sidebar { background: #F5F5F5; padding: 24px; border-radius: 16px; height: fit-content; }
+    .sidebar-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; text-transform: uppercase; color: #666; }
+    .category-list { display: flex; flex-direction: column; gap: 8px; }
+    .category-btn { padding: 12px 16px; background: none; border: none; border-radius: 8px; text-align: left; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+    .category-btn:hover, .category-btn.active { background: #00D948; color: #fff; }
+    .category-btn span { margin-right: 8px; }
+    
+    .products-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .product-card { background: #fff; border-radius: 16px; overflow: hidden; border: 1px solid #E0E0E0; transition: all 0.2s; }
+    .product-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+    .product-img { width: 100%; height: 180px; object-fit: cover; background: #F5F5F5; }
+    .product-info { padding: 16px; }
+    .product-weight { font-size: 12px; color: #999; }
+    .product-name { font-size: 16px; font-weight: 500; margin: 4px 0; }
+    .product-price-row { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+    .price { font-size: 18px; font-weight: 700; }
+    .price-note { display: block; font-size: 11px; color: #999; font-weight: 400; }
+    .add-btn { padding: 10px 16px; background: #00D948; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .add-btn:hover { background: #00B83A; }
+    
+    .empty-state { text-align: center; padding: 64px; color: #999; }
+    .empty-icon { font-size: 48px; display: block; margin-bottom: 16px; }
+    
+    @media (max-width: 992px) {
+      .products-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      header { height: 60px; padding: 0 16px; }
+      .logo { font-size: 20px; }
+      .logo span { font-size: 24px; }
+      nav { display: none; }
+      .container { padding: 16px; }
+      .page-header { flex-direction: column; gap: 16px; align-items: stretch; }
+      .page-header h1 { font-size: 24px; }
+      .search-box { width: 100%; }
+      .search-box input { width: 100%; }
+      .catalog-layout { grid-template-columns: 1fr; }
+      .sidebar { order: -1; }
+      .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .product-img { height: 120px; }
+      .product-info { padding: 10px; }
+      .product-name { font-size: 13px; }
+      .add-btn { width: 100%; margin-top: 8px; }
+    }
+    @media (max-width: 480px) {
+      .products-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html" class="logo"><span>📦</span>FastBox</a>
+    <nav>
+      <a href="catalog.html">Каталог</a>
+      <a href="index.html#features">О сервисе</a>
+    </nav>
+    <div class="header-actions" id="headerActions">
+      <a href="login.html" class="btn btn-outline" id="loginBtn">Войти</a>
+      <a href="cart.html" class="btn btn-primary cart-icon">
+        🛒 <span class="cart-badge" id="cartCount">0</span>
+      </a>
+    </div>
+  </header>
+  
+  <main>
+    <div class="container">
+      <div class="page-header">
+        <h1>Каталог</h1>
+        <div class="search-box">
+          <input type="text" placeholder="Поиск товаров..." id="searchInput">
+        </div>
+      </div>
+      
+      <div class="catalog-layout">
+        <aside class="sidebar">
+          <div class="sidebar-title">Категории</div>
+          <div class="category-list">
+            <button class="category-btn active" data-category="">📦 Все товары</button>
+            <button class="category-btn" data-category="products">🥛 Продукты</button>
+            <button class="category-btn" data-category="frozen">🧊 Заморозка</button>
+            <button class="category-btn" data-category="ready">🍲 Готовые блюда</button>
+            <button class="category-btn" data-category="drinks">🥤 Напитки</button>
+            <button class="category-btn" data-category="grocery">🌾 Бакалея</button>
+          </div>
+        </aside>
+        
+        <main class="products-grid" id="productsContainer"></main>
+      </div>
+    </div>
+  </main>
+  
+  <script>
+    const API_URL = 'http://localhost:5000/api';
+    let cart = JSON.parse(localStorage.getItem('fastbox_cart') || '[]');
+    let products = [];
+    let currentCategory = '';
+    
+    function updateCartBadge() {
+      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+      document.getElementById('cartCount').textContent = count;
+    }
+    
+    function checkAuth() {
+      const token = localStorage.getItem('fastbox_token');
+      const user = JSON.parse(localStorage.getItem('fastbox_user') || 'null');
+      const headerActions = document.getElementById('headerActions');
+      if (token && user) {
+        headerActions.innerHTML = '<a href="dashboard.html" class="btn btn-outline">' + user.name + '</a> <a href="cart.html" class="btn btn-primary cart-icon">🛒 <span class="cart-badge" id="cartCount">0</span></a>';
+        updateCartBadge();
+      }
+    }
+    
+    async function loadProducts() {
+      try {
+        const res = await fetch(API_URL + '/products');
+        products = await res.json();
+        renderProducts();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    
+    function renderProducts() {
+      const container = document.getElementById('productsContainer');
+      let filtered = products;
+      
+      if (currentCategory) {
+        // Support both id and name filtering
+        filtered = products.filter(p => {
+          const catName = p.category?.name?.toLowerCase();
+          const searchCat = currentCategory.toLowerCase();
+          return catName === searchCat || p.categoryId === currentCategory || 
+            (currentCategory === 'products' && (catName === 'продукты' || p.category?.name === 'Продукты')) ||
+            (currentCategory === 'frozen' && (catName === 'заморозка' || p.category?.name === 'Заморозка')) ||
+            (currentCategory === 'ready' && (catName === 'готовые блюда' || p.category?.name === 'Готовые блюда')) ||
+            (currentCategory === 'drinks' && (catName === 'напитки' || p.category?.name === 'Напитки')) ||
+            (currentCategory === 'grocery' && (catName === 'бакалея' || p.category?.name === 'Бакалея'));
+        });
+      }
+      
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      if (searchTerm) {
+        filtered = filtered.filter(p => p.name.toLowerCase().includes(searchTerm));
+      }
+      
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="empty-state"><span class="empty-icon">🔍</span><p>Товары не найдены</p></div>';
+        return;
+      }
+      
+      container.innerHTML = filtered.map(p => `
+        <div class="product-card">
+          <img src="${p.imageUrl}" alt="${p.name}" class="product-img">
+          <div class="product-info">
+            <span class="product-weight">${p.weight}</span>
+            <h3 class="product-name">${p.name}</h3>
+            <div class="product-price-row">
+              <div>
+                <span class="price">${p.price}₽</span>
+                <span class="price-note">Закупочная: ${p.basePrice}₽</span>
+              </div>
+              <button class="add-btn" onclick="addToCart('${p.id}', '${p.name}', ${p.price})">В корзину</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function getCategoryName(id) {
+      const names = { '1': 'Продукты', '2': 'Заморозка', '3': 'Готовые блюда', '4': 'Напитки', '5': 'Бакалея', 'products': 'Продукты', 'frozen': 'Заморозка', 'ready': 'Готовые блюда', 'drinks': 'Напитки', 'grocery': 'Бакалея' };
+      return names[id] || '';
+    }
+    
+    function addToCart(id, name, price) {
+      const existing = cart.find(item => item.productId === id);
+      if (existing) {
+        existing.quantity++;
+      } else {
+        cart.push({ productId: id, name, price, quantity: 1 });
+      }
+      localStorage.setItem('fastbox_cart', JSON.stringify(cart));
+      updateCartBadge();
+      alert('Добавлено в корзину: ' + name);
+    }
+    
+    document.querySelectorAll('.category-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentCategory = btn.dataset.category;
+        renderProducts();
+      });
+    });
+    
+    document.getElementById('searchInput').addEventListener('input', renderProducts);
+    
+    checkAuth();
+    updateCartBadge();
+    loadProducts();
+  </script>
+</body>
+</html>

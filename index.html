@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FastBox - Доставка без обмана</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #00D948;
+      --primary-dark: #00B83A;
+      --secondary: #1A1A1A;
+      --accent: #FF6B35;
+      --bg: #FFFFFF;
+      --bg2: #F5F5F5;
+      --text: #1A1A1A;
+      --text2: #666666;
+      --border: #E0E0E0;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+    
+    header {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 72px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; z-index: 100;
+    }
+    .logo { font-size: 24px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+    .logo span { font-size: 28px; }
+    nav { display: flex; gap: 24px; }
+    nav a { color: var(--text2); text-decoration: none; font-weight: 500; }
+    nav a:hover { color: var(--primary); }
+    .header-actions { display: flex; gap: 12px; align-items: center; }
+    .btn { padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; text-decoration: none; }
+    .btn-primary { background: var(--primary); color: #fff; border: none; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+    
+    main { padding-top: 72px; }
+    
+    .hero {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      padding: 80px 24px; color: #fff; text-align: center;
+    }
+    .hero h1 { font-size: 48px; font-weight: 700; margin-bottom: 16px; }
+    .hero p { font-size: 24px; opacity: 0.9; margin-bottom: 32px; }
+    .hero-search { display: flex; max-width: 600px; margin: 0 auto; gap: 12px; }
+    .hero-search input {
+      flex: 1; padding: 16px 20px; border: none; border-radius: 12px; font-size: 16px;
+    }
+    .hero-stats { display: flex; justify-content: center; gap: 48px; margin-top: 48px; }
+    .stat { text-align: center; }
+    .stat-num { font-size: 24px; font-weight: 700; }
+    .stat-label { font-size: 14px; opacity: 0.8; }
+    
+    .section { padding: 64px 24px; max-width: 1200px; margin: 0 auto; }
+    .section-title { font-size: 32px; font-weight: 700; margin-bottom: 32px; }
+    
+    .features-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+    }
+    .feature-card {
+      text-align: center; padding: 32px; background: #fff; border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .feature-icon { font-size: 40px; display: block; margin-bottom: 16px; }
+    .feature-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .feature-desc { font-size: 14px; color: var(--text2); }
+    
+    .categories-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px;
+    }
+    .category-card {
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      padding: 32px 16px; background: var(--bg2); border-radius: 16px;
+      text-decoration: none; color: var(--text); transition: all 0.2s;
+    }
+    .category-card:hover { background: var(--primary); color: #fff; transform: translateY(-2px); }
+    .category-icon { font-size: 36px; }
+    
+    .products-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    }
+    .product-card {
+      background: #fff; border-radius: 16px; overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.2s;
+    }
+    .product-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+    .product-img { width: 100%; height: 120px; object-fit: cover; background: var(--bg2); }
+    .product-info { padding: 12px; }
+    .product-weight { font-size: 11px; color: #999; }
+    .product-name { font-size: 13px; font-weight: 500; margin: 4px 0 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .product-price-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .price { font-size: 16px; font-weight: 700; }
+    .btn { padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; font-size: 12px; }
+    
+    .cta {
+      background: var(--secondary); color: #fff; padding: 64px 24px; text-align: center;
+    }
+    .cta-title { font-size: 32px; font-weight: 700; margin-bottom: 16px; }
+    .cta-desc { font-size: 18px; opacity: 0.85; max-width: 500px; margin: 0 auto 32px; }
+    .cta-benefits { display: flex; justify-content: center; gap: 32px; margin-bottom: 32px; flex-wrap: wrap; }
+    
+    footer {
+      background: var(--secondary); color: #fff; padding: 48px 24px 24px;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 32px; max-width: 1200px; margin: 0 auto;
+    }
+    .footer-logo { display: flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 700; color: var(--primary); margin-bottom: 12px; }
+    .footer-desc { color: #999; font-size: 14px; max-width: 280px; }
+    .footer-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+    .footer-link { display: block; color: #999; font-size: 14px; margin-bottom: 8px; text-decoration: none; }
+    .footer-link:hover { color: var(--primary); }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1);
+      margin-top: 32px; font-size: 14px; color: #999; max-width: 1200px; margin-left: auto; margin-right: auto;
+    }
+    
+    /* Мобильная адаптация */
+    @media (max-width: 1200px) {
+      .products-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    }
+    
+    @media (max-width: 992px) {
+      .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .features-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    }
+    
+    @media (max-width: 768px) {
+      header { padding: 0 16px; height: 60px; }
+      .logo { font-size: 20px; }
+      .logo span { font-size: 24px; }
+      nav { display: none; }
+      
+      .hero { padding: 48px 16px; }
+      .hero h1 { font-size: 28px; }
+      .hero p { font-size: 16px; margin-bottom: 24px; }
+      .hero-search { flex-direction: column; gap: 8px; }
+      .hero-search input { width: 100%; }
+      .hero-search .btn { width: 100%; }
+      
+      .hero-stats { flex-wrap: wrap; gap: 24px; justify-content: center; }
+      .stat { text-align: center; }
+      
+      .section { padding: 40px 16px; }
+      .section-title { font-size: 24px; margin-bottom: 20px; }
+      
+      .features-grid, .categories-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .product-card { border-radius: 12px; }
+      .product-img { height: 100px; }
+      .product-info { padding: 10px; }
+      .product-name { font-size: 12px; }
+      .product-price-row { flex-direction: column; gap: 8px; align-items: stretch; }
+      .product-price-row .btn { width: 100%; }
+      .price { font-size: 14px; }
+      
+      .cta { padding: 40px 16px; }
+      .cta-title { font-size: 24px; }
+      .cta-desc { font-size: 14px; }
+      .cta-benefits { flex-direction: column; gap: 12px; }
+      
+      .footer { padding: 32px 16px 16px; }
+      .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+      .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+      
+      header .header-actions { gap: 8px; }
+      header .btn { padding: 8px 12px; font-size: 12px; }
+      header .logo { gap: 4px; }
+    }
+    
+    @media (max-width: 480px) {
+      .products-grid { grid-template-columns: 1fr; gap: 12px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .categories-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .category-card { padding: 16px 8px; }
+      .category-icon { font-size: 24px; }
+      .category-name { font-size: 12px; }
+    }
+    
+    /* Адаптация для каталога */
+    @media (max-width: 768px) {
+      .catalog-layout { grid-template-columns: 1fr; }
+      .sidebar { padding: 12px; }
+      .category-list { display: flex; flex-wrap: wrap; gap: 8px; }
+      .category-btn { font-size: 12px; padding: 8px 12px; }
+      .products-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    
+    /* Адаптация для корзины */
+    @media (max-width: 768px) {
+      .cart-layout { grid-template-columns: 1fr; }
+      .cart-item { flex-wrap: wrap; gap: 12px; }
+      .cart-item-img { width: 60px; height: 60px; }
+      .cart-item-info { width: 100%; }
+      .cart-item-qty { margin: 0 auto; }
+      .cart-item-price { width: 100%; text-align: center; }
+    }
+    
+    /* Адаптация для личного кабинета */
+    @media (max-width: 768px) {
+      .profile-header { flex-direction: column; gap: 16px; text-align: center; }
+      .user-info { flex-direction: column; }
+      .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .tab { white-space: nowrap; padding: 10px 16px; font-size: 12px; }
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+    
+    @media (max-width: 480px) {
+      .container { padding: 16px; }
+      .card { padding: 16px; }
+      .form-group input { font-size: 14px; padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html" class="logo"><span>📦</span>FastBox</a>
+    <nav>
+      <a href="catalog.html">Каталог</a>
+      <a href="index.html#features">О сервисе</a>
+      <a href="register.html?role=courier">Для курьеров</a>
+    </nav>
+    <div class="header-actions" id="headerAuth">
+      <a href="login.html" class="btn btn-outline">Войти</a>
+      <a href="register.html" class="btn btn-primary">Регистрация</a>
+    </div>
+  </header>
+  
+  <main>
+    <section class="hero">
+      <h1>Доставка без обмана</h1>
+      <p>Точная цена, честный сервис, довольный курьер</p>
+      <form class="hero-search" onsubmit="search(event)">
+        <input type="text" placeholder="Введите адрес доставки...">
+        <button type="submit" class="btn btn-primary">Найти</button>
+      </form>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-num">99₽</div><div class="stat-label">доставка</div></div>
+        <div class="stat"><div class="stat-num">от 20 мин</div><div class="stat-label">время</div></div>
+        <div class="stat"><div class="stat-num">бесплатно</div><div class="stat-label">от 1500₽</div></div>
+      </div>
+    </section>
+    
+    <section class="section" id="features">
+      <h2 class="section-title">Почему выбирают FastBox</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <span class="feature-icon">💰</span>
+          <h3 class="feature-title">Прозрачные цены</h3>
+          <p class="feature-desc">Цена = закупочная + 10%. Никаких скрытых наценок!</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">📍</span>
+          <h3 class="feature-title">Отслеживание курьера</h3>
+          <p class="feature-desc">Видите курьера на карте в реальном времени</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">⭐</span>
+          <h3 class="feature-title">Рейтинг курьеров</h3>
+          <p class="feature-desc">Оценивайте курьеров и читайте честные отзывы</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🎧</span>
+          <h3 class="feature-title">Поддержка 24/7</h3>
+          <p class="feature-desc">Всегда на связи, поможем в любой ситуации</p>
+        </div>
+      </div>
+    </section>
+    
+    <section class="section" id="catalog">
+      <h2 class="section-title">Категории</h2>
+      <div class="categories-grid">
+        <a href="javascript:void(0)" class="category-card" onclick="filterCategory('products')"><span class="category-icon">🥛</span><span>Продукты</span></a>
+        <a href="javascript:void(0)" class="category-card" onclick="filterCategory('frozen')"><span class="category-icon">🧊</span><span>Заморозка</span></a>
+        <a href="javascript:void(0)" class="category-card" onclick="filterCategory('ready')"><span class="category-icon">🍲</span><span>Готовые блюда</span></a>
+        <a href="javascript:void(0)" class="category-card" onclick="filterCategory('drinks')"><span class="category-icon">🥤</span><span>Напитки</span></a>
+        <a href="javascript:void(0)" class="category-card" onclick="filterCategory('grocery')"><span class="category-icon">🌾</span><span>Бакалея</span></a>
+      </div>
+    </section>
+    
+    <section class="section">
+      <h2 class="section-title">Популярные товары</h2>
+      <div class="products-grid" id="products-container"></div>
+    </section>
+    
+    <section class="cta" id="courier">
+      <h2 class="cta-title">Стань курьером FastBox</h2>
+      <p class="cta-desc">Зарабатывай от 3000₽ в день. Гибкий график, честная оплата, поддержка 24/7.</p>
+      <div class="cta-benefits">
+        <span>💰 Зарплата от 3000₽/день</span>
+        <span>📅 Гибкий график</span>
+        <span>📱 Удобное приложение</span>
+        <span>🎁 Бонусы за рейтинг</span>
+      </div>
+      <a href="register.html?role=courier" class="btn btn-primary">Стать курьером</a>
+    </section>
+  </main>
+  
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo"><span>📦</span>FastBox</div>
+        <p class="footer-desc">Доставка без обмана. Прозрачные цены, честный сервис, довольный курьер.</p>
+      </div>
+      <div>
+        <h4 class="footer-title">Покупателям</h4>
+        <a href="catalog.html" class="footer-link">Каталог товаров</a>
+        <a href="cart.html" class="footer-link">Корзина</a>
+        <a href="dashboard.html" class="footer-link">Личный кабинет</a>
+      </div>
+      <div>
+        <h4 class="footer-title">Партнерам</h4>
+        <a href="register.html?role=courier" class="footer-link">Стать курьером</a>
+        <a href="#courier" class="footer-link">Заработок</a>
+      </div>
+      <div>
+        <h4 class="footer-title">Контакты</h4>
+        <p class="footer-link">📞 8 (800) 123-45-67</p>
+        <p class="footer-link">✉️ hello@fastbox.ru</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2024 FastBox. Все права защищены.</p>
+    </div>
+  </footer>
+  
+  <script>
+    const products = [
+      // Продукты
+      { name: 'Молоко пастеризованное 3.2%', price: 89, basePrice: 75, weight: '1л', category: 'products', imageUrl: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=300&h=300&fit=crop' },
+      { name: 'Хлеб ржаной', price: 59, basePrice: 45, weight: '400г', category: 'products', imageUrl: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300&h=300&fit=crop' },
+      { name: 'Яйца куриные С1', price: 119, basePrice: 99, weight: '10 шт', category: 'products', imageUrl: 'https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=300&h=300&fit=crop' },
+      { name: 'Сметана 15%', price: 95, basePrice: 80, weight: '300г', category: 'products', imageUrl: 'https://images.unsplash.com/photo-1626957341926-98752fc2ba90?w=300&h=300&fit=crop' },
+      { name: 'Сыр Российский', price: 189, basePrice: 160, weight: '200г', category: 'products', imageUrl: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=300&h=300&fit=crop' },
+      { name: 'Курица филе', price: 349, basePrice: 290, weight: '500г', category: 'products', imageUrl: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=300&h=300&fit=crop' },
+      { name: 'Творог 5%', price: 129, basePrice: 110, weight: '250г', category: 'products', imageUrl: 'https://images.unsplash.com/photo-1559598467-f8b76c8155d0?w=300&h=300&fit=crop' },
+      { name: 'Масло сливочное 82%', price: 159, basePrice: 135, weight: '180г', category: 'products', imageUrl: 'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=300&h=300&fit=crop' },
+      // Заморозка
+      { name: 'Пельмени классические', price: 289, basePrice: 250, weight: '500г', category: 'frozen', imageUrl: 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=300&h=300&fit=crop' },
+      { name: 'Вареники с вишней', price: 249, basePrice: 210, weight: '400г', category: 'frozen', imageUrl: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300&h=300&fit=crop' },
+      { name: 'Блины с мясом', price: 199, basePrice: 170, weight: '300г', category: 'frozen', imageUrl: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300&h=300&fit=crop' },
+      { name: 'Пицца Маргарита', price: 349, basePrice: 290, weight: '400г', category: 'frozen', imageUrl: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=300&h=300&fit=crop' },
+      // Готовые блюда
+      { name: 'Борщ классический', price: 189, basePrice: 160, weight: '500мл', category: 'ready', imageUrl: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=300&h=300&fit=crop' },
+      { name: 'Плов с курицей', price: 279, basePrice: 240, weight: '350г', category: 'ready', imageUrl: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=300&h=300&fit=crop' },
+      { name: 'Солянка мясная', price: 219, basePrice: 185, weight: '500мл', category: 'ready', imageUrl: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=300&h=300&fit=crop' },
+      { name: 'Гречка с овощами', price: 169, basePrice: 145, weight: '300г', category: 'ready', imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=300&fit=crop' },
+      // Напитки
+      { name: 'Cola 0.5л', price: 79, basePrice: 65, weight: '0.5л', category: 'drinks', imageUrl: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300&h=300&fit=crop' },
+      { name: 'Сок апельсиновый', price: 149, basePrice: 120, weight: '1л', category: 'drinks', imageUrl: 'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=300&h=300&fit=crop' },
+      { name: 'Вода питьевая', price: 49, basePrice: 35, weight: '1.5л', category: 'drinks', imageUrl: 'https://images.unsplash.com/photo-1559839914-17aae19cec71?w=300&h=300&fit=crop' },
+      { name: 'Энергетик', price: 99, basePrice: 80, weight: '0.45л', category: 'drinks', imageUrl: 'https://images.unsplash.com/photo-1622543925917-763c34d1a86e?w=300&h=300&fit=crop' },
+      // Бакалея
+      { name: 'Рис длиннозерный', price: 149, basePrice: 120, weight: '1кг', category: 'grocery', imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=300&h=300&fit=crop' },
+      { name: 'Макароны спагетти', price: 89, basePrice: 70, weight: '500г', category: 'grocery', imageUrl: 'https://images.unsplash.com/photo-1551462147-37885db2595c?w=300&h=300&fit=crop' },
+      { name: 'Мука пшеничная', price: 69, basePrice: 55, weight: '2кг', category: 'grocery', imageUrl: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=300&h=300&fit=crop' },
+      { name: 'Подсолнечное масло', price: 119, basePrice: 95, weight: '1л', category: 'grocery', imageUrl: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300&h=300&fit=crop' },
+    ];
+    
+    function renderProducts(filter) {
+      const container = document.getElementById('products-container');
+      const filtered = filter ? products.filter(p => p.category === filter) : products;
+      container.innerHTML = filtered.map(p => `
+        <div class="product-card">
+          <img src="${p.imageUrl}" alt="${p.name}" class="product-img">
+          <div class="product-info">
+            <span class="product-weight">${p.weight}</span>
+            <h3 class="product-name">${p.name}</h3>
+            <div class="product-price-row">
+              <span class="price">${p.price}₽</span>
+              <button class="btn btn-primary" onclick="addToCart('${p.name}')">В корзину</button>
+            </div>
+          </ </div>
+        </div>
+      `).join('');
+    }
+    
+    function filterCategory(cat) { 
+      const container = document.getElementById('products-container');
+      if (cat === 'products') {
+        container.innerHTML = products.filter(p => p.category === 'products').map(p => renderProductCard(p)).join('');
+      } else if (cat === 'frozen') {
+        container.innerHTML = products.filter(p => p.category === 'frozen').map(p => renderProductCard(p)).join('');
+      } else if (cat === 'ready') {
+        container.innerHTML = products.filter(p => p.category === 'ready').map(p => renderProductCard(p)).join('');
+      } else if (cat === 'drinks') {
+        container.innerHTML = products.filter(p => p.category === 'drinks').map(p => renderProductCard(p)).join('');
+      } else if (cat === 'grocery') {
+        container.innerHTML = products.filter(p => p.category === 'grocery').map(p => renderProductCard(p)).join('');
+      } else {
+        renderProducts();
+      }
+    }
+    
+    function renderProductCard(p) {
+      return `
+        <div class="product-card">
+          <img src="${p.imageUrl}" alt="${p.name}" class="product-img">
+          <div class="product-info">
+            <span class="product-weight">${p.weight}</span>
+            <h3 class="product-name">${p.name}</h3>
+            <div class="product-price-row">
+              <span class="price">${p.price}₽</span>
+              <button class="btn btn-primary" onclick="addToCart('${p.name}')">В корзину</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    function addToCart(name) { alert('Добавлено в корзину: ' + name); }
+    function search(e) { 
+      e.preventDefault();
+      const addressInput = document.querySelector('.hero-search input');
+      const address = addressInput.value.trim();
+      if (address) {
+        // Сохраняем адрес доставки
+        localStorage.setItem('fastbox_delivery_address', address);
+        alert('Адрес доставки сохранён: ' + address + '\nТеперь можете заказать доставку на этот адрес!');
+        // Переходим в каталог
+        window.location.href = 'catalog.html';
+      } else {
+        alert('Пожалуйста, введите адрес доставки');
+      }
+    }
+    
+    // Проверка авторизации
+    function checkAuth() {
+      const user = JSON.parse(localStorage.getItem('fastbox_user') || 'null');
+      const headerAuth = document.getElementById('headerAuth');
+      if (user) {
+        headerAuth.innerHTML = '<a href="dashboard.html" class="btn btn-outline">' + user.name + '</a>';
+      }
+    }
+    
+    // Обработка навигации без перезагрузки
+    document.querySelectorAll('nav a').forEach(link => {
+      link.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href && href.startsWith('#')) {
+          e.preventDefault();
+          const target = document.querySelector(href);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+      });
+    });
+    
+    renderProducts();
+    checkAuth();
+  </script>
+</body>
+</html>

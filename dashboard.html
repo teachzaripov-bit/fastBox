@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FastBox - Личный кабинет</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #F5F5F5; }
+    header { position: fixed; top: 0; left: 0; right: 0; height: 72px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 100; }
+    .logo { display: flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 700; color: #00D948; text-decoration: none; }
+    .logo span { font-size: 28px; }
+    nav { display: flex; gap: 24px; }
+    nav a { color: #666; text-decoration: none; font-weight: 500; }
+    .btn { padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; text-decoration: none; }
+    .btn-outline { background: transparent; border: 2px solid #E0E0E0; color: #1A1A1A; }
+    .btn-primary { background: #00D948; color: #fff; border: none; }
+    
+    main { padding-top: 72px; }
+    .container { max-width: 800px; margin: 0 auto; padding: 24px; }
+    
+    .profile-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .user-info { display: flex; align-items: center; gap: 16px; }
+    .user-avatar { width: 60px; height: 60px; border-radius: 50%; background: #00D948; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; }
+    .user-name { font-size: 24px; font-weight: 700; }
+    .user-email { color: #666; }
+    
+    .tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+    .tab { padding: 12px 24px; background: #fff; border: none; border-radius: 12px; font-size: 14px; font-weight: 500; cursor: pointer; color: #666; }
+    .tab.active { background: #00D948; color: #fff; }
+    
+    .card { background: #fff; border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+    .card-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+    
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; color: #666; }
+    .form-group input { width: 100%; padding: 12px 16px; border: 2px solid #E0E0E0; border-radius: 12px; font-size: 14px; }
+    .form-group input:focus { border-color: #00D948; outline: none; }
+    
+    .address-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #F5F5F5; border-radius: 12px; margin-bottom: 12px; }
+    .address-item.active { border: 2px solid #00D948; }
+    .address-text { font-size: 14px; }
+    .address-default { font-size: 12px; color: #00D948; margin-top: 4px; }
+    .address-actions { display: flex; gap: 8px; }
+    .address-btn { padding: 6px 12px; background: #fff; border: 1px solid #E0E0E0; border-radius: 8px; font-size: 12px; cursor: pointer; }
+    
+    .history-item { padding: 16px; background: #F5F5F5; border-radius: 12px; margin-bottom: 12px; }
+    .history-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .history-id { font-weight: 600; }
+    .history-status { padding: 4px 10px; background: #00D948; color: #fff; border-radius: 8px; font-size: 12px; }
+    .history-details { font-size: 13px; color: #666; }
+    .history-total { font-size: 16px; font-weight: 700; margin-top: 8px; }
+    
+    .save-btn { width: 100%; padding: 14px; background: #00D948; color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 16px; }
+    .save-btn:hover { background: #00B83A; }
+    
+    .logout-btn { background: none; border: none; color: #FF3D00; cursor: pointer; font-size: 14px; }
+    
+    .courier-panel { display: none; }
+    .courier-panel.active { display: block; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: #fff; padding: 20px; border-radius: 16px; text-align: center; }
+    .stat-num { font-size: 28px; font-weight: 700; color: #00D948; }
+    .stat-label { font-size: 12px; color: #666; margin-top: 4px; }
+    
+    @media (max-width: 992px) {
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      header { height: 60px; padding: 0 16px; }
+      .logo { font-size: 20px; }
+      .logo span { font-size: 24px; }
+      nav { display: none; }
+      .container { padding: 16px; }
+      .profile-header { flex-direction: column; gap: 16px; text-align: center; }
+      .user-info { flex-direction: column; }
+      .user-avatar { width: 48px; height: 48px; font-size: 18px; }
+      .user-name { font-size: 18px; }
+      .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 8px; }
+      .tab { white-space: nowrap; padding: 10px 14px; font-size: 12px; }
+      .card { padding: 16px; border-radius: 12px; }
+      .card-title { font-size: 16px; margin-bottom: 16px; }
+      .stats-grid { grid-template-columns: 1fr; gap: 12px; }
+      .stat-card { padding: 16px; border-radius: 12px; }
+      .stat-num { font-size: 20px; }
+      .address-item { flex-direction: column; gap: 12px; text-align: center; }
+      .address-actions { justify-content: center; flex-wrap: wrap; }
+      .logout-btn { width: 100%; padding: 12px; }
+    }
+    
+    @media (max-width: 480px) {
+      .container { padding: 12px; }
+      .form-group input { font-size: 14px; padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html" class="logo"><span>📦</span>FastBox</a>
+    <nav>
+      <a href="catalog.html">Каталог</a>
+      <a href="index.html#features">О сервисе</a>
+    </nav>
+    <a href="javascript:void(0)" class="btn btn-outline" id="authBtn">Войти</a>
+  </header>
+  
+  <main>
+    <div class="container">
+      <div class="profile-header">
+        <div class="user-info">
+          <div class="user-avatar" id="userAvatar">П</div>
+          <div>
+            <div class="user-name" id="userName">Загрузка...</div>
+            <div class="user-email" id="userEmail">...</div>
+          </div>
+        </div>
+        <button class="logout-btn" onclick="logout()">Выйти из аккаунта</button>
+      </div>
+      
+      <div class="tabs">
+        <button class="tab active" onclick="showTab('profile')">Профиль</button>
+        <button class="tab" onclick="showTab('orders')">Заказы</button>
+        <button class="tab" onclick="showTab('addresses')">Адреса</button>
+        <button class="tab" id="courierTab" onclick="showTab('courier')" style="display:none;">Панель курьера</button>
+      </div>
+      
+      <!-- Профиль -->
+      <div id="profileTab" class="card">
+        <div class="card-title">Редактировать профиль</div>
+        <div class="form-group">
+          <label>Имя</label>
+          <input type="text" id="editName" placeholder="Ваше имя">
+        </div>
+        <div class="form-group">
+          <label>Телефон</label>
+          <input type="tel" id="editPhone" placeholder="+7 (999) 123-45-67">
+        </div>
+        <div class="form-group">
+          <label>Город</label>
+          <input type="text" id="editCity" placeholder="Москва">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="editEmail" placeholder="email@example.com">
+        </div>
+        <div class="form-group">
+          <label>Новый пароль (оставьте пустым, если не меняете)</label>
+          <input type="password" id="editPassword" placeholder="********">
+        </div>
+        <button class="save-btn" onclick="saveProfile()">Сохранить изменения</button>
+      </div>
+      
+      <!-- Заказы -->
+      <div id="ordersTab" class="card" style="display:none;">
+        <div class="card-title">История заказов</div>
+        <div id="ordersList">
+          <p style="color:#666;text-align:center;padding:24px;">У вас пока нет заказов</p>
+        </div>
+      </div>
+      
+      <!-- Адреса -->
+      <div id="addressesTab" class="card" style="display:none;">
+        <div class="card-title">Мои адреса доставки</div>
+        <div id="addressesList"></div>
+        <div class="form-group" style="margin-top:16px;">
+          <label>Добавить новый адрес</label>
+          <input type="text" id="newAddress" placeholder="Улица, дом, квартира, подъезд, этаж">
+        </div>
+        <button class="btn btn-primary" onclick="addAddress()" style="width:100%;margin-top:8px;">Добавить адрес</button>
+      </div>
+      
+      <!-- Панель курьера -->
+      <div id="courierTab" class="courier-panel card">
+        <div class="card-title">🚴 Панель курьера</div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-num" id="courierDelivered">0</div>
+            <div class="stat-label">Доставлено</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="courierEarned">0₽</div>
+            <div class="stat-label">Заработано</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="courierRating">5.0</div>
+            <div class="stat-label">Рейтинг</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Статус</label>
+          <select id="courierStatus" style="width:100%;padding:12px;border:2px solid #E0E0E0;border-radius:12px;">
+            <option value="available">На линии</option>
+            <option value="offline">Недоступен</option>
+          </select>
+        </div>
+        <div id="courierOrders">
+          <p style="color:#666;text-align:center;padding:24px;">Нет активных заказов</p>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <script>
+    let user = null;
+    let addresses = JSON.parse(localStorage.getItem('fastbox_addresses') || '[]');
+    let orders = [];
+    
+    function checkAuth() {
+      const token = localStorage.getItem('fastbox_token');
+      user = JSON.parse(localStorage.getItem('fastbox_user') || 'null');
+      if (!token || !user) {
+        window.location.href = 'login.html';
+        return false;
+      }
+      
+      const authBtn = document.getElementById('authBtn');
+      if (authBtn) {
+        authBtn.textContent = user.name;
+        authBtn.href = 'javascript:void(0)';
+        authBtn.onclick = function() {};
+      }
+      return true;
+    }
+    
+    function renderProfile() {
+      document.getElementById('userAvatar').textContent = user.name[0].toUpperCase();
+      document.getElementById('userName').textContent = user.name;
+      document.getElementById('userEmail').textContent = user.email;
+      
+      document.getElementById('editName').value = user.name || '';
+      document.getElementById('editEmail').value = user.email || '';
+      document.getElementById('editPhone').value = user.phone || '';
+      document.getElementById('editCity').value = user.city || '';
+      
+      // Показать вкладку курьера если роль курьера
+      if (user.role === 'courier') {
+        document.getElementById('courierTab').style.display = 'inline-block';
+        renderCourierStats();
+      }
+      
+      renderAddresses();
+    }
+    
+    function renderAddresses() {
+      const list = document.getElementById('addressesList');
+      if (addresses.length === 0) {
+        list.innerHTML = '<p style="color:#666;text-align:center;padding:24px;">Добавьте адрес доставки</p>';
+        return;
+      }
+      list.innerHTML = addresses.map((addr, i) => `
+        <div class="address-item ${addr.default ? 'active' : ''}">
+          <div>
+            <div class="address-text">${addr.text}</div>
+            ${addr.default ? '<div class="address-default">✓ Основной адрес</div>' : ''}
+          </div>
+          <div class="address-actions">
+            <button class="address-btn" onclick="setDefaultAddress(${i})">По умолчанию</button>
+            <button class="address-btn" onclick="deleteAddress(${i})">Удалить</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function renderCourierStats() {
+      document.getElementById('courierDelivered').textContent = user.courier?.totalDelivered || '0';
+      document.getElementById('courierEarned').textContent = (user.courier?.totalEarned || '0') + '₽';
+      document.getElementById('courierRating').textContent = (user.courier?.rating || '5.0');
+    }
+    
+    function showTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      document.getElementById('profileTab').style.display = tab === 'profile' ? 'block' : 'none';
+      document.getElementById('ordersTab').style.display = tab === 'orders' ? 'block' : 'none';
+      document.getElementById('addressesTab').style.display = tab === 'addresses' ? 'block' : 'none';
+      document.getElementById('courierTab').style.display = tab === 'courier' ? 'block' : 'none';
+    }
+    
+    function saveProfile() {
+      const name = document.getElementById('editName').value;
+      const email = document.getElementById('editEmail').value;
+      const phone = document.getElementById('editPhone').value;
+      const city = document.getElementById('editCity').value;
+      
+      user.name = name;
+      user.email = email;
+      user.phone = phone;
+      user.city = city;
+      
+      localStorage.setItem('fastbox_user', JSON.stringify(user));
+      alert('Профиль сохранён!');
+      renderProfile();
+    }
+    
+    function addAddress() {
+      const text = document.getElementById('newAddress').value;
+      if (!text) return alert('Введите адрес');
+      
+      addresses.push({ text: text, default: addresses.length === 0 });
+      localStorage.setItem('fastbox_addresses', JSON.stringify(addresses));
+      document.getElementById('newAddress').value = '';
+      renderAddresses();
+      alert('Адрес добавлен!');
+    }
+    
+    function setDefaultAddress(i) {
+      addresses.forEach((a, j) => a.default = j === i);
+      localStorage.setItem('fastbox_addresses', JSON.stringify(addresses));
+      renderAddresses();
+    }
+    
+    function deleteAddress(i) {
+      addresses.splice(i, 1);
+      localStorage.setItem('fastbox_addresses', JSON.stringify(addresses));
+      renderAddresses();
+    }
+    
+    function logout() {
+      localStorage.removeItem('fastbox_token');
+      localStorage.removeItem('fastbox_user');
+      localStorage.removeItem('fastbox_addresses');
+      window.location.href = 'index.html';
+    }
+    
+    // Запуск
+    if (checkAuth()) {
+      renderProfile();
+    }
+  </script>
+</body>
+</html>

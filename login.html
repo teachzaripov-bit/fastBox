@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FastBox - Вход</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #F5F5F5; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .login-card { background: #fff; padding: 48px; border-radius: 24px; box-shadow: 0 4px 24px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+    .logo { display: flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 700; color: #00D948; margin-bottom: 8px; justify-content: center; }
+    .logo span { font-size: 32px; }
+    h1 { text-align: center; margin-bottom: 8px; }
+    .subtitle { text-align: center; color: #666; margin-bottom: 32px; }
+    .form { display: flex; flex-direction: column; gap: 16px; }
+    input { width: 100%; padding: 16px; border: 2px solid #E0E0E0; border-radius: 12px; font-size: 16px; outline: none; transition: border-color 0.2s; }
+    input:focus { border-color: #00D948; }
+    .btn { width: 100%; padding: 16px; background: #00D948; color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .btn:hover { background: #00B83A; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .error { color: #FF3D00; font-size: 14px; text-align: center; }
+    .footer { text-align: center; margin-top: 24px; color: #666; }
+    .footer a { color: #00D948; text-decoration: none; }
+    .back { display: block; text-align: center; margin-top: 16px; color: #666; text-decoration: none; }
+    
+    @media (max-width: 480px) {
+      .login-card { padding: 24px; margin: 16px; border-radius: 16px; }
+      .logo { font-size: 20px; }
+      .logo span { font-size: 28px; }
+      h1 { font-size: 20px; }
+      input { padding: 14px; font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="logo"><span>📦</span>FastBox</div>
+    <h1>Вход</h1>
+    <p class="subtitle">Введите данные для входа</p>
+    <form class="form" id="loginForm">
+      <input type="email" placeholder="Email" id="email" required>
+      <input type="password" placeholder="Пароль" id="password" required>
+      <div class="error" id="error"></div>
+      <button type="submit" class="btn" id="submitBtn">Войти</button>
+    </form>
+    <p class="footer">Нет аккаунта? <a href="register.html">Зарегистрироваться</a></p>
+    <a href="index.html" class="back">← На главную</a>
+  </div>
+  <script>
+    const API_URL = 'http://localhost:5000/api';
+    
+    // Если уже вошёл - на дашборд
+    if (localStorage.getItem('fastbox_token')) {
+      window.location.href = 'dashboard.html';
+    }
+    
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const submitBtn = document.getElementById('submitBtn');
+      const error = document.getElementById('error');
+      
+      submitBtn.textContent = 'Вход...';
+      submitBtn.disabled = true;
+      error.textContent = '';
+      
+      try {
+        const res = await fetch(API_URL + '/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        
+        if (!res.ok) throw new Error(data.error || 'Ошибка входа');
+        
+        localStorage.setItem('fastbox_token', data.token);
+        localStorage.setItem('fastbox_user', JSON.stringify(data.user));
+        window.location.href = 'dashboard.html';
+      } catch (err) {
+        error.textContent = err.message;
+        submitBtn.textContent = 'Войти';
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FastBox - Корзина</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #fff; }
+    header { position: fixed; top: 0; left: 0; right: 0; height: 72px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 100; }
+    .logo { display: flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 700; color: #00D948; text-decoration: none; }
+    .logo span { font-size: 28px; }
+    nav { display: flex; gap: 24px; }
+    nav a { color: #666; text-decoration: none; font-weight: 500; }
+    .btn { padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; text-decoration: none; }
+    .btn-primary { background: #00D948; color: #fff; border: none; }
+    .btn-outline { background: transparent; border: 2px solid #E0E0E0; color: #1A1A1A; }
+    
+    main { padding-top: 72px; padding-bottom: 100px; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 32px 24px; }
+    h1 { font-size: 32px; font-weight: 700; margin-bottom: 32px; }
+    
+    .cart-layout { display: grid; grid-template-columns: 1fr 350px; gap: 32px; }
+    .cart-items { display: flex; flex-direction: column; gap: 16px; }
+    .cart-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: #fff; border: 1px solid #E0E0E0; border-radius: 16px; }
+    .cart-item-img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; background: #F5F5F5; }
+    .cart-item-info { flex: 1; }
+    .cart-item-name { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
+    .cart-item-weight { font-size: 14px; color: #999; }
+    .cart-item-qty { display: flex; align-items: center; gap: 8px; }
+    .qty-btn { width: 32px; height: 32px; border-radius: 8px; background: #F5F5F5; border: none; font-size: 18px; cursor: pointer; }
+    .qty-btn:hover { background: #E0E0E0; }
+    .cart-item-price { font-size: 18px; font-weight: 700; min-width: 80px; text-align: right; }
+    .cart-item-remove { width: 32px; height: 32px; font-size: 24px; background: none; border: none; color: #999; cursor: pointer; }
+    
+    .cart-summary { background: #fff; border: 1px solid #E0E0E0; border-radius: 16px; padding: 24px; height: fit-content; }
+    .summary-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+    .summary-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #E0E0E0; }
+    .summary-row.total { font-size: 18px; font-weight: 700; border-bottom: none; padding-top: 16px; }
+    .free-delivery { font-size: 12px; color: #00D948; margin-top: 8px; }
+    .checkout-btn { width: 100%; padding: 16px; background: #00D948; color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 16px; }
+    .checkout-btn:hover { background: #00B83A; }
+    .checkout-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .continue-btn { display: block; text-align: center; margin-top: 16px; color: #666; text-decoration: none; }
+    
+    .price-info { margin-top: 24px; padding: 16px; background: #F5F5F5; border-radius: 12px; }
+    .price-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+    .price-info p { font-size: 12px; color: #666; margin-bottom: 4px; }
+    .price-info .highlight { color: #00D948; font-weight: 500; }
+    
+    .empty-cart { text-align: center; padding: 64px; }
+    .empty-icon { font-size: 64px; display: block; margin-bottom: 16px; }
+    .empty-cart h2 { margin-bottom: 8px; }
+    .empty-cart p { color: #666; margin-bottom: 24px; }
+    
+    @media (max-width: 992px) {
+      .cart-layout { grid-template-columns: 1fr; }
+      .cart-summary { order: -1; }
+    }
+    @media (max-width: 768px) {
+      header { height: 60px; padding: 0 16px; }
+      .logo { font-size: 20px; }
+      nav { display: none; }
+      .container { padding: 16px; }
+      h1 { font-size: 24px; }
+      .cart-layout { grid-template-columns: 1fr; }
+      .cart-item { flex-wrap: wrap; gap: 12px; padding: 12px; }
+      .cart-item-img { width: 60px; height: 60px; }
+      .cart-item-info { width: calc(100% - 80px); }
+      .cart-item-qty { margin: 8px auto; }
+      .cart-item-price { width: 100%; text-align: center; font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html" class="logo"><span>📦</span>FastBox</a>
+    <nav>
+      <a href="catalog.html">Каталог</a>
+      <a href="index.html#features">О сервисе</a>
+    </nav>
+    <div class="header-actions" id="headerActions">
+      <a href="login.html" class="btn btn-outline" id="loginBtn">Войти</a>
+      <a href="catalog.html" class="btn">В каталог</a>
+    </div>
+  </header>
+  
+  <main>
+    <div class="container">
+      <h1>Корзина</h1>
+      
+      <div id="cartContent"></div>
+    </div>
+  </main>
+  
+  <script>
+    let cart = JSON.parse(localStorage.getItem('fastbox_cart') || '[]');
+    
+    function renderCart() {
+      const container = document.getElementById('cartContent');
+      
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="empty-cart">
+            <span class="empty-icon">🛒</span>
+            <h2>Корзина пуста</h2>
+            <p>Добавьте товары из каталога</p>
+            <a href="catalog.html" class="btn btn-primary">В каталог</a>
+          </div>
+        `;
+        return;
+      }
+      
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const deliveryFee = subtotal >= 1500 ? 0 : 99;
+      const total = subtotal + deliveryFee;
+      
+      container.innerHTML = `
+        <div class="cart-layout">
+          <div class="cart-items">
+            ${cart.map(item => `
+              <div class="cart-item" data-id="${item.productId}">
+                <div class="cart-item-info">
+                  <div class="cart-item-name">${item.name}</div>
+                  <div class="cart-item-weight">${item.price}₽/шт</div>
+                </div>
+                <div class="cart-item-qty">
+                  <button class="qty-btn" onclick="updateQty('${item.productId}', ${item.quantity - 1})">-</button>
+                  <span>${item.quantity}</span>
+                  <button class="qty-btn" onclick="updateQty('${item.productId}', ${item.quantity + 1})">+</button>
+                </div>
+                <div class="cart-item-price">${item.price * item.quantity}₽</div>
+                <button class="cart-item-remove" onclick="removeItem('${item.productId}')">×</button>
+              </div>
+            `).join('')}
+          </div>
+          
+          <div class="cart-summary">
+            <div class="summary-title">Итого</div>
+            <div class="summary-row">
+              <span>Товары (${cart.reduce((s, i) => s + i.quantity, 0)})</span>
+              <span>${subtotal}₽</span>
+            </div>
+            <div class="summary-row">
+              <span>Доставка</span>
+              <span>${deliveryFee === 0 ? '0₽' : deliveryFee + '₽'}</span>
+            </div>
+            ${deliveryFee > 0 ? '<div class="free-delivery">Бесплатно от 1500₽</div>' : ''}
+            <div class="summary-row total">
+              <span>К оплате</span>
+              <span>${total}₽</span>
+            </div>
+            <button class="checkout-btn" onclick="checkout()">Оформить заказ</button>
+            <a href="catalog.html" class="continue-btn">Продолжить покупки</a>
+            
+            <div class="price-info">
+              <h4>💰 Прозрачное ценообразование</h4>
+              <p>Цена = Закупочная + Наша наценка (10-15%)</p>
+              <p class="highlight">Никаких ск��ытых комиссий!</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    function updateQty(id, qty) {
+      if (qty <= 0) {
+        cart = cart.filter(item => item.productId !== id);
+      } else {
+        const item = cart.find(i => i.productId === id);
+        if (item) item.quantity = qty;
+      }
+      localStorage.setItem('fastbox_cart', JSON.stringify(cart));
+      renderCart();
+    }
+    
+    function removeItem(id) {
+      cart = cart.filter(item => item.productId !== id);
+      localStorage.setItem('fastbox_cart', JSON.stringify(cart));
+      renderCart();
+    }
+    
+    function checkout() {
+      const token = localStorage.getItem('fastbox_token');
+      if (!token) {
+        alert('Для оформления заказа необходимо войти');
+        window.location.href = 'login.html?redirect=checkout';
+        return;
+      }
+      alert('Функция оформления заказа пока недоступна. Это демо-версия!');
+    }
+    
+    function checkAuth() {
+      const user = JSON.parse(localStorage.getItem('fastbox_user') || 'null');
+      const headerActions = document.getElementById('headerActions');
+      if (user) {
+        headerActions.innerHTML = '<a href="dashboard.html" class="btn btn-outline">' + user.name + '</a> <a href="catalog.html" class="btn">В каталог</a>';
+      }
+    }
+    
+    renderCart();
+    checkAuth();
+  </script>
+</body>
+</html>

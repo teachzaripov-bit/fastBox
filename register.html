@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FastBox - Регистрация</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #F5F5F5; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .card { background: #fff; padding: 48px; border-radius: 24px; box-shadow: 0 4px 24px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+    .logo { display: flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 700; color: #00D948; margin-bottom: 8px; justify-content: center; }
+    .logo span { font-size: 32px; }
+    h1 { text-align: center; margin-bottom: 8px; }
+    .subtitle { text-align: center; color: #666; margin-bottom: 24px; }
+    .form { display: flex; flex-direction: column; gap: 16px; }
+    input, select { width: 100%; padding: 16px; border: 2px solid #E0E0E0; border-radius: 12px; font-size: 16px; outline: none; transition: border-color 0.2s; }
+    input:focus, select:focus { border-color: #00D948; }
+    .role-select { display: flex; gap: 12px; }
+    .role-btn { flex: 1; padding: 16px; background: #F5F5F5; border: 2px solid #E0E0E0; border-radius: 12px; font-size: 14px; font-weight: 500; cursor: pointer; text-align: center; transition: all 0.2s; }
+    .role-btn.active { border-color: #00D948; background: rgba(0,217,72,0.1); }
+    .role-btn input { display: none; }
+    .benefits { text-align: left; padding: 16px; background: #F5F5F5; border-radius: 12px; margin-bottom: 8px; }
+    .benefits p { font-size: 14px; margin-bottom: 4px; }
+    .btn { width: 100%; padding: 16px; background: #00D948; color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .btn:hover { background: #00B83A; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .error { color: #FF3D00; font-size: 14px; text-align: center; }
+    .footer { text-align: center; margin-top: 24px; color: #666; }
+    .footer a { color: #00D948; text-decoration: none; }
+    
+    @media (max-width: 480px) {
+      .card { padding: 20px; margin: 12px; border-radius: 16px; }
+      .logo { font-size: 20px; }
+      h1 { font-size: 20px; }
+      input { padding: 14px; font-size: 14px; }
+      .role-select { flex-direction: column; }
+      .role-btn { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo"><span>📦</span>FastBox</div>
+    <h1>Регистрация</h1>
+    <p class="subtitle">Создайте аккаунт</p>
+    <form class="form" id="registerForm">
+      <input type="text" placeholder="Ваше имя" id="name" required>
+      <input type="email" placeholder="Email" id="email" required>
+      <input type="tel" placeholder="Телефон" id="phone">
+      <input type="password" placeholder="Пароль" id="password" required>
+      
+      <div class="role-select">
+        <label class="role-btn active" id="clientBtn">
+          <input type="radio" name="role" value="client" checked>
+          <div>🛒 Покупатель</div>
+        </label>
+        <label class="role-btn" id="courierBtn">
+          <input type="radio" name="role" value="courier">
+          <div>🚴 Курьер</div>
+        </label>
+      </div>
+      
+      <div id="courierBenefits" class="benefits" style="display: none;">
+        <p>💰 Зарплата от 3000₽/день</p>
+        <p>📅 Гибкий график</p>
+        <p>🎁 Бонусы за рейтинг</p>
+      </div>
+      
+      <div class="error" id="error"></div>
+      <button type="submit" class="btn" id="submitBtn">Зарегистрироваться</button>
+    </form>
+    <p class="footer">Есть аккаунт? <a href="login.html">Войти</a></p>
+  </div>
+  
+  <script>
+    const API_URL = 'http://localhost:5000/api';
+    const urlParams = new URLSearchParams(window.location.search);
+    const roleParam = urlParams.get('role');
+    
+    // Если уже вошёл - на дашборд
+    if (localStorage.getItem('fastbox_token')) {
+      const user = JSON.parse(localStorage.getItem('fastbox_user') || 'null');
+      window.location.href = user?.role === 'courier' ? 'courier.html' : 'dashboard.html';
+    }
+    
+    if (roleParam === 'courier') {
+      document.getElementById('courierBtn').classList.add('active');
+      document.getElementById('clientBtn').classList.remove('active');
+      document.querySelector('#courierBtn input').checked = true;
+      document.getElementById('courierBenefits').style.display = 'block';
+    }
+    
+    document.getElementById('courierBtn').addEventListener('click', () => {
+      document.getElementById('courierBtn').classList.add('active');
+      document.getElementById('clientBtn').classList.remove('active');
+      document.querySelector('#courierBtn input').checked = true;
+      document.getElementById('courierBenefits').style.display = 'block';
+    });
+    
+    document.getElementById('clientBtn').addEventListener('click', () => {
+      document.getElementById('clientBtn').classList.add('active');
+      document.getElementById('courierBtn').classList.remove('active');
+      document.querySelector('#clientBtn input').checked = true;
+      document.getElementById('courierBenefits').style.display = 'none';
+    });
+    
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
+      const password = document.getElementById('password').value;
+      const role = document.querySelector('input[name="role"]:checked').value;
+      
+      const submitBtn = document.getElementById('submitBtn');
+      const error = document.getElementById('error');
+      
+      submitBtn.textContent = 'Регистрация...';
+      submitBtn.disabled = true;
+      error.textContent = '';
+      
+      try {
+        const res = await fetch(API_URL + '/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, name, phone, role })
+        });
+        const data = await res.json();
+        
+        if (!res.ok) throw new Error(data.error || 'Ошибка регистрации');
+        
+        localStorage.setItem('fastbox_token', data.token);
+        localStorage.setItem('fastbox_user', JSON.stringify(data.user));
+        
+        if (role === 'courier') {
+          window.location.href = 'courier.html';
+        } else {
+          window.location.href = 'dashboard.html';
+        }
+      } catch (err) {
+        error.textContent = err.message;
+        submitBtn.textContent = 'Зарегистрироваться';
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
